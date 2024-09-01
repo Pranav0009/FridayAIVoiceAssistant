@@ -186,6 +186,35 @@ def allCommands(message=1):
         elif "joke" in query or "tell a joke" in query:
             speak(pyjokes.get_joke())
 
+        elif "weather" in query:
+            
+            # to get API of Open weather
+            api_key = ""
+            base_url = "http://api.openweathermap.org/data/2.5/weather?"
+            speak(" Location name ")
+            city_name = takecommand()
+            complete_url = f"http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}"
+            max_retries = 3
+            retry_delay = 1
+            for _ in range(max_retries):
+                try:
+                    response = requests.get(complete_url)
+                    response.raise_for_status()
+                    x = response.json()
+                except ConnectionError:
+                    print("Connection error occurred. Retrying...")
+                    time.sleep(retry_delay)
+            if x["cod"] != "4n04":
+                y = x["main"]
+                current_temperature = y["temp"]
+                current_pressure = y["pressure"]
+                current_humidiy = y["humidity"]
+                z = x["weather"]
+                weather_description = z[0]["description"]
+                speak(f" Temperature is: {str(int(current_temperature-273.15))} ° Celsius, Atmospheric pressure is: {str(current_pressure)} hPa , \n Humidity is: {str(current_humidiy)} % , \n Description:  {str(weather_description)}.")
+            else:
+                speak(" City Not Found ")
+
         else:
             # from engine.features import chatBot
             # chatBot(query)
